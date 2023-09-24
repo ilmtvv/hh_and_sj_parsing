@@ -1,12 +1,12 @@
 class Vacancy:
-    def __init__(self, name, url, salary, responsibility):
-        self.name = name
+    def __init__(self, title, url, salary, responsibility):
+        self.title = title
         self.url = url
         self.salary = salary
         self.responsibility = responsibility
 
     def __str__(self):
-        return f'{self.name}\n{self.url}\n{self.salary}\n{self.responsibility}\n'
+        return f'{self.title}\n{self.url}\n{self.salary}\n{self.responsibility}\n'
 
 
 class ListVacancies:
