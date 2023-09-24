@@ -10,10 +10,11 @@ class JSONSaver:
                 'title': vacancy.title,
                 'url': vacancy.url,
                 'salary': vacancy.salary,
+                'currency': vacancy.currency,
                 'responsibility': vacancy.responsibility,
             })
-        with open('vacancies.json', 'a', encoding='windows-1251') as file:
-            json.dump(json_vacancies, file, indent=6, ensure_ascii=False)
+        with open('vacancies.json', 'a') as file:
+            json.dump(json_vacancies, file, indent=6)
 
 
 

@@ -8,31 +8,50 @@ sj_api = SuperJobAPI()
 
 
 def get_vacancies_hh(text, area):
-
     data = hh_api.get_vacancies(text, area)
     vacancies = data.get('items', [])
 
     for vacancy in vacancies:
         name = vacancy.get('name')
         url = vacancy.get('alternate_url')
-        salary = vacancy.get('salary')
+        salary_hh = vacancy.get('salary')
+
+        if salary_hh is None:
+            salary = 0
+            currency = None
+        elif salary_hh['from'] is None and salary_hh['to'] is not None:
+            salary = salary_hh['to']
+            currency = salary_hh['currency']
+        elif salary_hh['from'] is not None and salary_hh['to'] is None:
+            salary = salary_hh['from']
+            currency = salary_hh['currency']
+        else:
+            salary = (salary_hh['from'] + salary_hh['to']) / 2
+            currency = salary_hh['currency']
+
         responsibility = vacancy['snippet'].get('responsibility')
 
-        list_of_vacancies.add_vacancy(Vacancy(name, url, salary, responsibility))
+        list_of_vacancies.add_vacancy(Vacancy(name, url, salary, currency, responsibility))
 
 
-def get_vacancies_sj(text,area):
-
+def get_vacancies_sj(text, area):
     data = sj_api.get_vacancies(text, area)
     vacancies = data.get('objects', [])
 
     for vacancy in vacancies:
         name = vacancy.get('profession')
         url = vacancy.get('link')
-        salary = vacancy.get('payment_from')
+
+        if vacancy.get('payment_from') is None and vacancy.get('payment_to') is not None:
+            salary = vacancy.get('payment_to')
+        elif vacancy.get('payment_from') is not None and vacancy.get('payment_to') is None:
+            salary = vacancy.get('payment_from')
+        else:
+            salary = (vacancy.get('payment_from') + vacancy.get('payment_to')) / 2
+        currency = vacancy.get('currency')
         responsibility = vacancy.get('candidat')
 
-        list_of_vacancies.add_vacancy(Vacancy(name, url, salary, responsibility))
+        list_of_vacancies.add_vacancy(Vacancy(name, url, salary, currency, responsibility))
 
 
 def main():
@@ -55,5 +74,6 @@ def main():
     json_saver = JSONSaver()
     json_saver.add_vacancy(list_of_vacancies.list_of_vacancies)
 
+    user_salary = int(input('введите зп меньше которой вы получать не хотите '))
 
-
+    list_of_vacancies.ge_salary(user_salary)
