@@ -5,11 +5,13 @@ import requests as requests
 
 from dotenv import load_dotenv
 
+
 class JobPlatformAPI(ABC):
-
-
+    """
+    Абстрактный класс для API.
+    """
     @abstractmethod
-    def get_vacancies(self):
+    def get_vacancies(self, text, area):
         pass
 
     @abstractmethod
@@ -20,6 +22,7 @@ class JobPlatformAPI(ABC):
 class HeadHunterAPI(JobPlatformAPI):
     url = 'https://api.hh.ru/vacancies'
     url_area = 'https://api.hh.ru/areas/113'
+
     def get_vacancies(self, text, area):
         params = {
             'text': text,
@@ -32,29 +35,25 @@ class HeadHunterAPI(JobPlatformAPI):
         return data
 
     def search_area(self, area):
+        """
+        Поиск города в базе hh.
+        """
         response = requests.get(self.url_area)
         data = response.json()
 
-        flag = False
         for area_1 in data['areas']:
             if area_1['name'].lower() == area.lower():
-                flag = True
                 return area_1['id']
             else:
                 for area_2 in area_1['areas']:
                     if area_2['name'].lower() == area.lower():
-                        flag = True
                         return area_2['id']
                     else:
                         for area_3 in area_2['areas']:
                             if area_3['name'].lower() == area.lower():
-                                flag = True
                                 return area_2['id']
-
-        return flag
-
-
-
+                            else:
+                                return False
 
 
 class SuperJobAPI(JobPlatformAPI):
@@ -62,6 +61,7 @@ class SuperJobAPI(JobPlatformAPI):
     url_area = 'https://api.superjob.ru/2.0/towns/'
     load_dotenv()
     SJ_API_TOKEN = os.getenv('SJ_API_TOKEN')
+
     def get_vacancies(self, text, area):
         params = {
             'keyword': text,
@@ -71,7 +71,7 @@ class SuperJobAPI(JobPlatformAPI):
         headers = {
             'X-Api-App-Id': self.SJ_API_TOKEN
         }
-        response = requests.get(self.url,headers=headers, params=params)
+        response = requests.get(self.url, headers=headers, params=params)
 
         data = response.json()
         return data
@@ -85,7 +85,7 @@ class SuperJobAPI(JobPlatformAPI):
         }
         response = requests.get(self.url_area, headers=headers, params=params)
         data = response.json()
-        return data['objects'][0]['id']
-
-
-
+        if data['total'] == 0:
+            return False
+        else:
+            return data['objects'][0]['id']

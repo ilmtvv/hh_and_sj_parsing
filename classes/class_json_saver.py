@@ -2,8 +2,8 @@ import json
 
 
 class JSONSaver:
-
-    def add_vacancy(self, list_of_vacancies):
+    @staticmethod
+    def add_vacancy(list_of_vacancies):
         json_vacancies = []
         for vacancy in list_of_vacancies:
             json_vacancies.append({
@@ -15,8 +15,3 @@ class JSONSaver:
             })
         with open('vacancies.json', 'a') as file:
             json.dump(json_vacancies, file, indent=6)
-
-
-
-
-

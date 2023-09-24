@@ -8,6 +8,10 @@ sj_api = SuperJobAPI()
 
 
 def get_vacancies_hh(text, area):
+    """
+    Получение вакансий с hh.
+    """
+
     data = hh_api.get_vacancies(text, area)
     vacancies = data.get('items', [])
 
@@ -35,6 +39,10 @@ def get_vacancies_hh(text, area):
 
 
 def get_vacancies_sj(text, area):
+    """
+    Получение вакансий с hh.
+    """
+
     data = sj_api.get_vacancies(text, area)
     vacancies = data.get('objects', [])
 
@@ -48,6 +56,7 @@ def get_vacancies_sj(text, area):
             salary = vacancy.get('payment_from')
         else:
             salary = (vacancy.get('payment_from') + vacancy.get('payment_to')) / 2
+
         currency = vacancy.get('currency')
         responsibility = vacancy.get('candidat')
 
