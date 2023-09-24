@@ -14,6 +14,9 @@ class ListVacancies:
     def add_vacancy(self, vacancy):
         self.list_of_vacancies.append(vacancy)
 
+    def sort_by_salary(self):
+        pass
+
     def __str__(self):
         for vacancy in self.list_of_vacancies:
             print(vacancy)

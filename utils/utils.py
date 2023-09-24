@@ -3,10 +3,12 @@ from classes.class_json_saver import JSONSaver
 from classes.class_vacancies import ListVacancies, Vacancy
 
 list_of_vacancies = ListVacancies()
+hh_api = HeadHunterAPI()
+sj_api = SuperJobAPI()
 
 
 def get_vacancies_hh(text, area):
-    hh_api = HeadHunterAPI()
+
     data = hh_api.get_vacancies(text, area)
     vacancies = data.get('items', [])
 
@@ -20,7 +22,7 @@ def get_vacancies_hh(text, area):
 
 
 def get_vacancies_sj(text,area):
-    sj_api = SuperJobAPI()
+
     data = sj_api.get_vacancies(text, area)
     vacancies = data.get('objects', [])
 
@@ -34,11 +36,24 @@ def get_vacancies_sj(text,area):
 
 
 def main():
-    text = input('введите ключевое слово ')
-    area = 70
-    get_vacancies_hh(text, area)
-    get_vacancies_sj(text, area)
-    list_of_vacancies.__str__()
+    while True:
+        user_input_area = input('введите город ')
+        area_hh = hh_api.search_area(user_input_area)
+        area_sj = sj_api.search_area(user_input_area)
+        if area_hh or area_sj:
+            break
+
+    text = input('введите ключевое слово в вакансии ')
+
+    if area_hh:
+        get_vacancies_hh(text, area_hh)
+    if area_sj:
+        get_vacancies_sj(text, area_sj)
+
+    list_of_vacancies.sort_by_salary()
+
     json_saver = JSONSaver()
     json_saver.add_vacancy(list_of_vacancies.list_of_vacancies)
+
+
 

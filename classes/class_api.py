@@ -12,19 +12,46 @@ class JobPlatformAPI(ABC):
     def get_vacancies(self):
         pass
 
+    @abstractmethod
+    def search_area(self, area):
+        pass
+
 
 class HeadHunterAPI(JobPlatformAPI):
     url = 'https://api.hh.ru/vacancies'
+    url_area = 'https://api.hh.ru/areas/113'
     def get_vacancies(self, text, area):
         params = {
             'text': text,
             'area': area,
-            'per_page': 2,
+            'per_page': 10,
         }
         response = requests.get(self.url, params=params)
 
         data = response.json()
         return data
+
+    def search_area(self, area):
+        response = requests.get(self.url_area)
+        data = response.json()
+
+        flag = False
+        for area_1 in data['areas']:
+            if area_1['name'].lower() == area.lower():
+                flag = True
+                return area_1['id']
+            else:
+                for area_2 in area_1['areas']:
+                    if area_2['name'].lower() == area.lower():
+                        flag = True
+                        return area_2['id']
+                    else:
+                        for area_3 in area_2['areas']:
+                            if area_3['name'].lower() == area.lower():
+                                flag = True
+                                return area_2['id']
+
+        return flag
 
 
 
@@ -32,19 +59,33 @@ class HeadHunterAPI(JobPlatformAPI):
 
 class SuperJobAPI(JobPlatformAPI):
     url = 'https://api.superjob.ru/2.0/vacancies'
+    url_area = 'https://api.superjob.ru/2.0/towns/'
     load_dotenv()
     SJ_API_TOKEN = os.getenv('SJ_API_TOKEN')
     def get_vacancies(self, text, area):
         params = {
             'keyword': text,
             'town': area,
-            'count': 2,
+            'count': 10,
         }
         headers = {
             'X-Api-App-Id': self.SJ_API_TOKEN
         }
-        response = requests.get(self.url,headers=headers, params=params, )
+        response = requests.get(self.url,headers=headers, params=params)
 
         data = response.json()
         return data
+
+    def search_area(self, area):
+        params = {
+            'keyword': area.title(),
+        }
+        headers = {
+            'X-Api-App-Id': self.SJ_API_TOKEN
+        }
+        response = requests.get(self.url_area, headers=headers, params=params)
+        data = response.json()
+        return data['objects'][0]['id']
+
+
 
